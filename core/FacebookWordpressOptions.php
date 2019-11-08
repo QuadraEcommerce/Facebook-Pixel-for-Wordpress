@@ -35,8 +35,11 @@ class FacebookWordpressOptions {
   }
 
   public static function getDefaultPixelID() {
-    return is_null(FacebookPluginConfig::DEFAULT_PIXEL_ID)
-              ? '' : FacebookPluginConfig::DEFAULT_PIXEL_ID;
+    return apply_filters(
+        'default_facebook_pixel_id',
+        is_null(FacebookPluginConfig::DEFAULT_PIXEL_ID)
+           ? '' : FacebookPluginConfig::DEFAULT_PIXEL_ID
+    );
   }
 
   // Default is on for unset config
@@ -58,7 +61,7 @@ class FacebookWordpressOptions {
   }
 
   public static function getPixelId() {
-    return self::$options[FacebookPluginConfig::PIXEL_ID_KEY];
+    return apply_filters('facebook_pixel_id', self::$options[FacebookPluginConfig::PIXEL_ID_KEY]);
   }
 
   public static function getUsePii() {
