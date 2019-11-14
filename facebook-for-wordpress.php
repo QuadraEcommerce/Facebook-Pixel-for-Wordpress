@@ -6,7 +6,7 @@
  * Author: Facebook
  * Author URI: https://www.facebook.com/
  * CHANGE BACK IF BUILDING!!! Version: {*VERSION_NUMBER*}
- * Version: 1.7.25-ShopQuadra
+ * Version: 1.7.26-ShopQuadra
  * Text Domain: official-facebook-pixel
  */
 
