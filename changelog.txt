@@ -1,4 +1,49 @@
 *** Facebook for WordPress Changelog ***
+2021-01-28 version 3.0.1
+* Support for WordPress 5.6
+* Adding banner for plugin review
+* Adding action_source parameter to Conversions API events
+* Update Business SDK to v9.0.3
+
+2021-01-06 version 3.0.0
+* Adding Facebook Business Extension based configuration
+* Renaming to Facebook for WordPress
+
+2020-12-08 version 2.2.2
+* Update Business SDK to v9.0.1
+
+2020-11-04 version 2.2.1
+* Stop sending events for internal users
+* Fix Contact Form 7 integration bug, send events only on form submit success
+* Update Facebook Business SDK to v8.0.2
+* Requires PHP 5.6 or greater
+* Sending ViewContent Conversions API event from WooCommerce
+* Support for WooCommerce through Pixel and Conversions API
+
+2020-08-14 version 2.2.0
+* Support for WordPress 5.5
+* Improved Conversions API event quality
+* Sending AddToCart and ViewContent events from Easy Digitial Downloads
+* New filter added before the Conversions API event is sent
+
+2020-06-18 version 2.1.0
+* Support for WooCommerce through the Conversions API
+
+2020-04-23 version 2.0.2
+* Support for WordPress 5.4
+* Fixing an Illegal string offset error with WP Forms
+* Fixing the event source url for Conversions API events
+
+2020-03-23 version 2.0.1
+* Fixing an Undefined index error
+
+2020-03-09 version 2.0.0
+* Added support for Conversions API
+
+2019-12-02 version 1.8.0
+* Support for WordPress 5.3
+* Fix Gravity Forms confirmation redirect
+
 2019-02-18 version 1.7.25
 * remove get_called_class from the codebase
 

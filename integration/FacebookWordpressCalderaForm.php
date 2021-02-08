@@ -19,8 +19,13 @@ namespace FacebookPixelPlugin\Integration;
 
 defined('ABSPATH') or die('Direct access not allowed');
 
-use FacebookPixelPlugin\Core\FacebookPixel;
 use FacebookPixelPlugin\Core\FacebookPluginUtils;
+use FacebookPixelPlugin\Core\FacebookServerSideEvent;
+use FacebookPixelPlugin\Core\FacebookWordPressOptions;
+use FacebookPixelPlugin\Core\ServerEventFactory;
+use FacebookPixelPlugin\Core\PixelRenderer;
+use FacebookAds\Object\ServerSide\Event;
+use FacebookAds\Object\ServerSide\UserData;
 
 class FacebookWordpressCalderaForm extends FacebookWordpressIntegrationBase {
   const PLUGIN_FILE = 'caldera-forms/caldera-core.php';
@@ -34,20 +39,82 @@ class FacebookWordpressCalderaForm extends FacebookWordpressIntegrationBase {
   }
 
   public static function injectLeadEvent($out, $form) {
-    if (FacebookPluginUtils::isAdmin() || $out['status'] !== 'complete') {
+    if (
+      FacebookPluginUtils::isInternalUser() ||
+      $out['status'] !== 'complete'
+    ) {
       return $out;
     }
 
-    $param = array();
-    $code = FacebookPixel::getPixelLeadCode($param, self::TRACKING_NAME, true);
+    $server_event = ServerEventFactory::safeCreateEvent(
+      'Lead',
+      array(__CLASS__, 'readFormData'),
+      array($form),
+      self::TRACKING_NAME,
+      true
+    );
+    FacebookServerSideEvent::getInstance()->track($server_event);
+
+    $code = PixelRenderer::render(array($server_event), self::TRACKING_NAME);
     $code = sprintf("
     <!-- Facebook Pixel Event Code -->
     %s
     <!-- End Facebook Pixel Event Code -->
-         ",
-      $code);
+        ",
+    $code);
 
     $out['html'] .= $code;
     return $out;
+  }
+
+  public static function readFormData($form) {
+    if (empty($form)) {
+      return array();
+    }
+    return array(
+      'email' => self::getEmail($form),
+      'first_name' => self::getFirstName($form),
+      'last_name' => self::getLastName($form),
+      'phone' => self::getPhone($form),
+      'state' => self::getState($form)
+    );
+  }
+
+  private static function getEmail($form) {
+    return self::getFieldValue($form, 'type', 'email');
+  }
+
+  private static function getFirstName($form) {
+    return self::getFieldValue($form, 'slug', 'first_name');
+  }
+
+  private static function getLastName($form) {
+    return self::getFieldValue($form, 'slug', 'last_name');
+  }
+
+  private static function getState($form){
+    return self::getFieldValue($form, 'type', 'states');
+  }
+
+  private static function getPhone($form) {
+    // Extract phone number from the better version first, fallback to the basic
+    // version if it's null
+    $phone = self::getFieldValue($form, 'type', 'phone_better');
+    return empty($phone) ? self::getFieldValue($form, 'type', 'phone')
+      : $phone;
+  }
+
+  private static function getFieldValue($form, $attr, $attr_value) {
+    if (empty($form['fields'])) {
+      return null;
+    }
+
+    foreach ($form['fields'] as $field) {
+      if (array_key_exists($attr, $field) && $field[$attr] == $attr_value) {
+        return $_POST[$field['ID']];
+      }
+    }
+
+    return null;
   }
 }
