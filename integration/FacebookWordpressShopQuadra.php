@@ -32,12 +32,12 @@ class FacebookWordpressShopQuadra extends FacebookWordpressIntegrationBase {
 
   public static function injectPixelCode() {
     // Purchase
-
-    //ray(__METHOD__ . ' called')->green();
-
     add_action(
       'quadra_purchase_pixel',
-      array(__CLASS__, 'injectPurchaseEvent'), 11, 4);
+      array(__CLASS__, 'injectPurchaseEvent'),
+      $priority = 11,
+      $accepted_args = 4
+    );
   }
 
   /**
@@ -47,11 +47,8 @@ class FacebookWordpressShopQuadra extends FacebookWordpressIntegrationBase {
    * @param object|\Upsell\Models\Product $product
    */
   public static function injectPurchaseEvent($offerType, $order, $item, $product) {
-    // ray('injectPurchaseEvent parameters:', $offerType, $order, $item, $product)->green();
-
     if (FacebookPluginUtils::isInternalUser()) {
-      //ray('internal user, not injecting purchase event')->green();
-      // return;
+      return;
     }
 
     $serverEvent = ServerEventFactory::safeCreateEvent(
@@ -63,19 +60,13 @@ class FacebookWordpressShopQuadra extends FacebookWordpressIntegrationBase {
 
     $serverEvent = static::addCustomData($serverEvent, $offerType, $order);
 
-    //ray('$serverEvent:', $serverEvent)->hide();
-
     FacebookServerSideEvent::getInstance()->track($serverEvent, $sendNow = true);
 
     $code = PixelRenderer::render(array($serverEvent), self::TRACKING_NAME);
 
-    //ray("pixel event code: $code");
-
     printf("
 <!-- Facebook Pixel Event Code -->
-<!-- TEMPORARILY DISABLED
 %s
-TODO: REMOVE COMMENT TAGS -->
 <!-- End Facebook Pixel Event Code -->
      ",
       $code);
